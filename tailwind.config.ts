@@ -5,30 +5,16 @@ import type { Config } from 'tailwindcss';
 // The colors are exposed as nested groups so consumers can write
 // `bg-sky-sunset`, `text-fantasy-pink`, `border-night-dusk`, etc. and
 // Tailwind's JIT will emit a class for each one. The matching CSS custom
-// properties are declared in `src/index.css` for use in non-utility contexts
-// (inline SVG fills, `getComputedStyle` reads for canvas fills, etc.).
+// properties are declared in `src/index.css` for use in non-utility
+// contexts (inline SVG fills, `getComputedStyle` reads for canvas fills,
+// day/night gradient interpolations in AC-4).
 //
-// `safelist` keeps the AC-2 verification signal stable: even if no
-// component happens to reference a particular shade yet, the JIT will
-// still emit a class for it, so the build CSS contains every PRD hex.
-const PALETTE_KEYS = {
-  sky: ['morning', 'midday', 'sunset'],
-  fantasy: ['pink', 'blue', 'green', 'cream'],
-  night: ['deep', 'dusk', 'glow'],
-} as const;
-
-const safelist: string[] = [];
-for (const [group, shades] of Object.entries(PALETTE_KEYS)) {
-  for (const shade of shades) {
-    for (const prefix of ['bg', 'text', 'border', 'ring', 'from', 'to', 'via']) {
-      safelist.push(`${prefix}-${group}-${shade}`);
-    }
-  }
-}
-
+// No `safelist`: by AC-3 the real ParkPage, GamePage, and NotFoundPage
+// consume the palette directly, so the JIT picks up every class
+// naturally. The safelist that was added for AC-2's verification signal
+// has been removed to keep the production CSS lean.
 const config: Config = {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
-  safelist,
   theme: {
     extend: {
       colors: {
