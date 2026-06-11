@@ -23,6 +23,18 @@ export type GameStore = {
    * can fire the achievement watcher (AC-11).
    */
   setHighScore: (gameId: GameId, score: number) => boolean;
+  /**
+   * Update the stored best *time* (lower-is-better) for `gameId`.
+   * Used by Memory Match where the high score is the smallest
+   * elapsed-seconds count for a winning run. Always writes the
+   * value on the first call for a game (`prev === 0` means "never
+   * played"); for subsequent calls it only writes if `seconds` is
+   * strictly less than the previous best. Returns `true` if the
+   * stored value was updated, so the achievement watcher can fire
+   * for `memory-perfect` (AC-11). Time is stored in whole seconds
+   * (the input is floored internally for safety).
+   */
+  setBestTime: (gameId: GameId, seconds: number) => boolean;
 };
 
 /**
@@ -40,6 +52,17 @@ export const useGameStore = create<GameStore>()(
         if (score <= prev) return false;
         set((state) => ({
           highscores: { ...state.highscores, [gameId]: score },
+        }));
+        return true;
+      },
+      setBestTime: (gameId, seconds) => {
+        if (!Number.isFinite(seconds) || seconds <= 0) return false;
+        const safe = Math.floor(seconds);
+        const prev = get().highscores[gameId] ?? 0;
+        // Treat 0 (or missing) as "never played" — always seed.
+        if (prev > 0 && safe >= prev) return false;
+        set((state) => ({
+          highscores: { ...state.highscores, [gameId]: safe },
         }));
         return true;
       },

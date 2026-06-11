@@ -51,6 +51,7 @@ export default function GameShell({ gameId, entry }: GameShellProps) {
   // so a second tab updating the value will be picked up here too.
   const highScore = useGameStore((s) => s.highscores[gameId] ?? 0);
   const setHighScore = useGameStore((s) => s.setHighScore);
+  const setBestTime = useGameStore((s) => s.setBestTime);
 
   const handleScore = useCallback((next: number) => {
     setScore(next);
@@ -58,9 +59,17 @@ export default function GameShell({ gameId, entry }: GameShellProps) {
 
   const handleGameOver = useCallback(
     (finalScore: number) => {
-      setHighScore(gameId, finalScore);
+      // Memory Match (and any other future lower-is-better game)
+      // routes the final score to `setBestTime` so a slower run
+      // never overwrites a faster one. Everything else uses the
+      // standard "higher is better" `setHighScore`.
+      if (resolved?.lowerIsBetter) {
+        setBestTime(gameId, finalScore);
+      } else {
+        setHighScore(gameId, finalScore);
+      }
     },
-    [gameId, setHighScore],
+    [gameId, resolved, setHighScore, setBestTime],
   );
 
   const handleTogglePause = useCallback(() => {

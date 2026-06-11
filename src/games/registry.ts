@@ -11,11 +11,11 @@
 // buttons on the game-over overlay). Each Phase 1 game progressively
 // replaces the `PlaceholderGame` with its real component.
 import type { ComponentType } from 'react';
-import PlaceholderGame from './placeholder';
 import { SnakeGame } from './snake';
 import { BrickBreakerGame } from './brick-breaker';
 import { TetrisGame } from './tetris';
 import { Crystal2048Game } from './crystal-2048';
+import { MemoryGame } from './memory';
 
 export type GameId =
   | 'snake'
@@ -53,6 +53,12 @@ export type GameRegistryEntry = {
   description: string;
   /** Themed emoji shown on the park map card. */
   emoji: string;
+  /** `true` for games where a *lower* "high score" is better
+   *  (currently only Memory Match, where the value is the
+   *  best-time-in-seconds). Defaults to `false` (higher is
+   *  better). The GameShell uses this flag to route the
+   *  `onGameOver` payload to the right store action. */
+  lowerIsBetter?: boolean;
   /** React component that renders the game. */
   component: ComponentType<GameComponentProps>;
 };
@@ -104,7 +110,8 @@ export const GAME_REGISTRY: Record<GameId, GameRegistryEntry> = {
     attractionLabel: 'Memory Garden',
     description: 'Find every pair of enchanted flowers before the petals fall.',
     emoji: '🌸',
-    component: PlaceholderGame as unknown as GameRegistryEntry['component'],
+    lowerIsBetter: true,
+    component: MemoryGame as unknown as GameRegistryEntry['component'],
   },
 };
 
