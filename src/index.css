@@ -172,3 +172,121 @@ body {
     animation: none !important;
   }
 }
+
+/* AC-13: decoration loops. Each unlocked achievement drops a
+   visual into the park map (see src/store/decorations.ts). The
+   loop runs forever so the decoration feels alive; entrance /
+   exit fades are handled in JS by Framer Motion. */
+
+@keyframes decoration-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes decoration-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.95;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+}
+
+@keyframes decoration-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 6px currentColor);
+  }
+  50% {
+    transform: scale(1.06);
+    filter: drop-shadow(0 0 14px currentColor);
+  }
+}
+
+.decoration-float {
+  animation: decoration-float 4.5s ease-in-out infinite;
+}
+.decoration-breathe {
+  animation: decoration-breathe 3.6s ease-in-out infinite;
+}
+.decoration-pulse {
+  animation: decoration-pulse 3s ease-in-out infinite;
+}
+
+/* Same reduced-motion short-circuit as the ambient layer. The
+   entrance / exit fade-out is already handled in JS. */
+@media (prefers-reduced-motion: reduce) {
+  .decoration-float,
+  .decoration-breathe,
+  .decoration-pulse {
+    animation: none !important;
+  }
+}
+
+/* AC-13: decoration loops. Each unlocked achievement drops a
+   visual into the park map (see src/store/decorations.ts). The
+   loop runs forever so the decoration feels alive; entrance /
+   exit fades are handled in JS by Framer Motion. */
+
+@keyframes decoration-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes decoration-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.95;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+}
+
+@keyframes decoration-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 6px currentColor);
+  }
+  50% {
+    transform: scale(1.06);
+    filter: drop-shadow(0 0 14px currentColor);
+  }
+}
+
+.decoration-float {
+  animation: decoration-float 4.5s ease-in-out infinite;
+}
+.decoration-breathe {
+  animation: decoration-breathe 3.6s ease-in-out infinite;
+}
+.decoration-pulse {
+  animation: decoration-pulse 3s ease-in-out infinite;
+}
+
+/* Same reduced-motion short-circuit as the ambient layer. The
+   entrance / exit fade-out is already handled in JS. */
+@media (prefers-reduced-motion: reduce) {
+  .decoration-float,
+  .decoration-breathe,
+  .decoration-pulse {
+    animation: none !important;
+  }
+}

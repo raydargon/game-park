@@ -19,6 +19,7 @@ import {
 import AttractionCard from './AttractionCard';
 import AmbientLayer from './AmbientLayer';
 import DayNightSky, { PHASES, type SkyPhase } from './DayNightSky';
+import DecorationLayer from './DecorationLayer';
 import SoundToggle from './SoundToggle';
 
 type Zoom = { id: GameId; x: number; y: number } | null;
@@ -109,8 +110,15 @@ export default function ParkMap() {
         aria-label="Phase 1 attractions"
         className="relative z-10 mx-auto mt-10 w-full max-w-6xl px-4 pb-16 sm:px-6"
       >
+        {/* AC-13: per-achievement decoration layer (golden
+            statues, floating crystals, etc.) sits behind the
+            cards. `pointer-events: none` so it never blocks
+            card clicks; the cards themselves stay clickable
+            because they're rendered after this in DOM order
+            and the section is `position: relative`. */}
+        <DecorationLayer />
         <div
-          className="grid gap-4 sm:gap-5"
+          className="relative z-10 grid gap-4 sm:gap-5"
           style={{
             gridTemplateColumns: '1fr',
             gridTemplateAreas: `"${GAME_IDS[0]}"`,
