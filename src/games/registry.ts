@@ -15,6 +15,7 @@ import PlaceholderGame from './placeholder';
 import { SnakeGame } from './snake';
 import { BrickBreakerGame } from './brick-breaker';
 import { TetrisGame } from './tetris';
+import { Crystal2048Game } from './crystal-2048';
 
 export type GameId =
   | 'snake'
@@ -95,7 +96,7 @@ export const GAME_REGISTRY: Record<GameId, GameRegistryEntry> = {
     attractionLabel: 'Crystal Mine',
     description: 'Merge crystal tiles until you uncover the legendary 2048 gem.',
     emoji: '💎',
-    component: PlaceholderGame as unknown as GameRegistryEntry['component'],
+    component: Crystal2048Game as unknown as GameRegistryEntry['component'],
   },
   memory: {
     id: 'memory',
