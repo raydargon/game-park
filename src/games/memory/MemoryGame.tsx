@@ -48,7 +48,7 @@ export default function MemoryGame({
   onGameOver,
   onRestart,
 }: GameComponentProps) {
-  const { state, flipCard, tick, reset } = useMemory({ onScore, onGameOver });
+  const { state, flipCard, tick, reset } = useMemory({ gameId, onScore, onGameOver });
   const bestSeconds = useGameStore((s) => s.highscores['memory'] ?? 0);
 
   // Drive the timer from the rAF loop. The hook is the source of

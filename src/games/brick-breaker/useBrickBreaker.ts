@@ -19,6 +19,8 @@
 // itself never touches the DOM — `BrickBreakerGame.tsx` wires the
 // `useGameLoop` + event listeners.
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useGameStore } from '../../store/gameStore';
+import type { GameId } from '../registry';
 import {
   BALL_BASE_SPEED,
   BALL_MAX_SPEED,
@@ -37,6 +39,9 @@ import {
 import type { BrickBreakerState, Vec2 } from './types';
 
 export type UseBrickBreakerArgs = {
+  /** Game id (e.g. `'brick-breaker'`). Used to mark the game as
+   *  played for the `park-explorer` achievement (AC-11). */
+  gameId?: GameId;
   onScore: (score: number) => void;
   onGameOver: (finalScore: number) => void;
 };
@@ -97,11 +102,13 @@ function createInitialState(): BrickBreakerState {
     score: 0,
     lives: 3,
     level: 1,
+    bricksClearedThisRun: 0,
     status: 'ready',
   };
 }
 
 export function useBrickBreaker({
+  gameId,
   onScore,
   onGameOver,
 }: UseBrickBreakerArgs): UseBrickBreakerResult {
@@ -183,6 +190,7 @@ export function useBrickBreaker({
       const bricks = s.bricks;
       let score = s.score;
       let pendingGameOver = false;
+      let pendingBricksCleared = 0;
 
       for (let i = 0; i < subSteps; i += 1) {
         ballX += vx * subDt;
@@ -286,6 +294,12 @@ export function useBrickBreaker({
           const brick = bricks[hitRow]![hitCol]!;
           brick.alive = false;
           score += brick.points;
+          // AC-11: count this brick toward the lifetime
+          // `totalBricksCleared` (used by `brick-1000`). We
+          // accumulate locally and forward to the store on
+          // game-over (and on level-clear) so we don't pay a
+          // store-update cost per brick.
+          pendingBricksCleared += 1;
           if (hitAxis === 'y') {
             vy = -vy;
             ballY += vy < 0 ? -0.5 : 0.5;
@@ -303,6 +317,8 @@ export function useBrickBreaker({
             ...s,
             score,
             lives: 0,
+            bricksClearedThisRun:
+              s.bricksClearedThisRun + pendingBricksCleared,
             status: 'gameover',
           };
         }
@@ -312,6 +328,8 @@ export function useBrickBreaker({
           lives: newLives,
           ball: ballStartOnPaddle(s.paddleX),
           ballVel: { x: 0, y: 0 },
+          bricksClearedThisRun:
+            s.bricksClearedThisRun + pendingBricksCleared,
           status: 'ready',
         };
       }
@@ -328,6 +346,8 @@ export function useBrickBreaker({
           ballVel: { x: 0, y: 0 },
           level: s.level + 1,
           bricks: buildBricks(),
+          bricksClearedThisRun:
+            s.bricksClearedThisRun + pendingBricksCleared,
           status: 'levelclear',
         };
       }
@@ -338,6 +358,8 @@ export function useBrickBreaker({
         ballVel: { x: vx, y: vy },
         score,
         bricks,
+        bricksClearedThisRun:
+          s.bricksClearedThisRun + pendingBricksCleared,
       };
     });
   }, []);
@@ -362,13 +384,22 @@ export function useBrickBreaker({
     if (state.status === 'gameover' && !lastReportedGameOverRef.current) {
       lastReportedGameOverRef.current = true;
       onGameOverRef.current(state.score);
+      // AC-11: forward this run's brick count to the lifetime
+      // counter (used by `brick-1000`) and mark the game as
+      // played (used by `park-explorer`).
+      if (state.bricksClearedThisRun > 0) {
+        useGameStore
+          .getState()
+          .incrementBricksCleared(state.bricksClearedThisRun);
+      }
+      if (gameId) useGameStore.getState().markGamePlayed(gameId);
     }
     if (state.status === 'ready' && lastReportedGameOverRef.current) {
       // Re-mount / restart — reset the latch.
       lastReportedGameOverRef.current = false;
       lastReportedScoreRef.current = state.score;
     }
-  }, [state.status, state.score]);
+  }, [state.status, state.score, state.bricksClearedThisRun, gameId]);
 
   return { state, step, setPaddleX, movePaddleX, launch };
 }

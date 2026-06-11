@@ -43,7 +43,7 @@ export default function Crystal2048Game({
   onGameOver,
   onRestart,
 }: GameComponentProps) {
-  const { state, move, restart } = useCrystal2048({ onScore, onGameOver });
+  const { state, move, restart } = useCrystal2048({ gameId, onScore, onGameOver });
 
   // Arrow keys (and WASD aliases) for the four move directions.
   useKeyboard({

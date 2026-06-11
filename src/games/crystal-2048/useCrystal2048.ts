@@ -35,11 +35,16 @@ import {
   slideAndMerge,
   tilesToGrid,
 } from './grid';
+import { useGameStore } from '../../store/gameStore';
+import type { GameId } from '../registry';
 import type { Crystal2048State, Tile, TileValue } from './types';
 
 export type Direction = 'left' | 'right' | 'up' | 'down';
 
 export type UseCrystal2048Args = {
+  /** Game id (e.g. `'crystal-2048'`). Used to mark the game as
+   *  played for the `park-explorer` achievement (AC-11). */
+  gameId?: GameId;
   onScore: (score: number) => void;
   onGameOver: (finalScore: number) => void;
 };
@@ -175,6 +180,7 @@ function computeBestTile(tiles: Tile[], prev: TileValue): TileValue {
 }
 
 export function useCrystal2048({
+  gameId,
   onScore,
   onGameOver,
 }: UseCrystal2048Args): UseCrystal2048Result {
@@ -254,17 +260,29 @@ export function useCrystal2048({
     }
   }, [state.score]);
 
+  // AC-11: feed the lifetime `crystalBestTile` to the store on
+  // every increase so the `tetris-4096` achievement can fire
+  // mid-run as soon as the player reaches the 4096 tile (no
+  // need to wait for game-over).
+  useEffect(() => {
+    if (state.bestTile > 0) {
+      useGameStore.getState().recordCrystalBestTile(state.bestTile);
+    }
+  }, [state.bestTile]);
+
   useEffect(() => {
     if (state.status === 'gameover' && !lastReportedGameOverRef.current) {
       lastReportedGameOverRef.current = true;
       onGameOverRef.current(state.score);
+      // AC-11: mark this game as played for `park-explorer`.
+      if (gameId) useGameStore.getState().markGamePlayed(gameId);
     }
     if (state.status === 'running' && lastReportedGameOverRef.current) {
       // Fresh run after a restart.
       lastReportedGameOverRef.current = false;
       lastReportedScoreRef.current = state.score;
     }
-  }, [state.status, state.score]);
+  }, [state.status, state.score, gameId]);
 
   return { state, move, restart };
 }

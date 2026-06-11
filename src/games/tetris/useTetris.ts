@@ -30,9 +30,14 @@ import {
   TETROMINOES,
   WALL_KICKS,
 } from './constants';
+import { useGameStore } from '../../store/gameStore';
+import type { GameId } from '../registry';
 import type { Board, Cell, Tetromino, TetrominoId, TetrisState } from './types';
 
 export type UseTetrisArgs = {
+  /** Game id (e.g. `'tetris'`). Used to mark the game as played
+   *  for the `park-explorer` achievement (AC-11). */
+  gameId?: GameId;
   onScore: (score: number) => void;
   onGameOver: (finalScore: number) => void;
 };
@@ -224,6 +229,7 @@ function computeGhost(state: TetrisState): number {
 }
 
 export function useTetris({
+  gameId,
   onScore,
   onGameOver,
 }: UseTetrisArgs): UseTetrisResult {
@@ -335,12 +341,14 @@ export function useTetris({
     if (state.status === 'gameover' && !lastReportedGameOverRef.current) {
       lastReportedGameOverRef.current = true;
       onGameOverRef.current(state.score);
+      // AC-11: mark this game as played for `park-explorer`.
+      if (gameId) useGameStore.getState().markGamePlayed(gameId);
     }
     if (state.status === 'ready' && lastReportedGameOverRef.current) {
       lastReportedGameOverRef.current = false;
       lastReportedScoreRef.current = state.score;
     }
-  }, [state.status, state.score]);
+  }, [state.status, state.score, gameId]);
 
   return { state, step, moveLeft, moveRight, softDrop, hardDrop, rotate, hold, ghostY };
 }

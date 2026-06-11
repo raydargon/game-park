@@ -36,9 +36,14 @@ import {
   TOTAL_PAIRS,
   createShuffledCards,
 } from './constants';
+import { useGameStore } from '../../store/gameStore';
+import type { GameId } from '../registry';
 import type { MemoryCard, MemoryState } from './types';
 
 export type UseMemoryArgs = {
+  /** Game id (e.g. `'memory'`). Used to mark the game as played
+   *  for the `park-explorer` achievement (AC-11). */
+  gameId?: GameId;
   /** Called whenever the move counter changes (i.e. after each
    *  pair attempt). The shell mirrors this into the ScoreHud. */
   onScore: (moves: number) => void;
@@ -74,7 +79,11 @@ function createInitialState(): MemoryState {
   };
 }
 
-export function useMemory({ onScore, onGameOver }: UseMemoryArgs): UseMemoryResult {
+export function useMemory({
+  gameId,
+  onScore,
+  onGameOver,
+}: UseMemoryArgs): UseMemoryResult {
   const [state, setState] = useState<MemoryState>(createInitialState);
 
   // StrictMode-safe side-channel refs.
@@ -238,13 +247,15 @@ export function useMemory({ onScore, onGameOver }: UseMemoryArgs): UseMemoryResu
       lastReportedGameOverRef.current = true;
       const seconds = Math.max(1, Math.floor(state.elapsedMs / 1000));
       onGameOverRef.current(seconds);
+      // AC-11: mark this game as played for `park-explorer`.
+      if (gameId) useGameStore.getState().markGamePlayed(gameId);
     }
     if (state.status !== 'won' && lastReportedGameOverRef.current) {
       // A fresh run after a reset / re-mount.
       lastReportedGameOverRef.current = false;
       lastReportedMovesRef.current = state.moves;
     }
-  }, [state.status, state.moves, state.elapsedMs]);
+  }, [state.status, state.moves, state.elapsedMs, gameId]);
 
   // On unmount: cancel any pending mismatch timer.
   useEffect(() => {

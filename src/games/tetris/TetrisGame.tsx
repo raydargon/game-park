@@ -54,7 +54,7 @@ export default function TetrisGame({
     rotate,
     hold,
     ghostY,
-  } = useTetris({ onScore, onGameOver });
+  } = useTetris({ gameId, onScore, onGameOver });
 
   // Discrete key actions: arrows, Up, Space, Shift.
   useKeyboard({

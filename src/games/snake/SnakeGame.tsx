@@ -39,6 +39,7 @@ export default function SnakeGame({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const accumulatorRef = useRef(0);
   const { state, step, setDirection, tickMs } = useSnake({
+    gameId,
     onScore,
     onGameOver,
   });

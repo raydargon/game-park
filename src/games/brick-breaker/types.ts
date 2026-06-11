@@ -39,5 +39,9 @@ export type BrickBreakerState = {
   lives: number;
   /** 1-indexed; advances when the grid is cleared. */
   level: number;
+  /** Total bricks broken this run (resets on remount). Used to
+   *  feed the lifetime `totalBricksCleared` counter in the
+   *  store for the `brick-1000` achievement (AC-11). */
+  bricksClearedThisRun: number;
   status: BrickBreakerStatus;
 };

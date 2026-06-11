@@ -46,6 +46,7 @@ export default function BrickBreakerGame({
 }: GameComponentProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const { state, step, setPaddleX, movePaddleX, launch } = useBrickBreaker({
+    gameId,
     onScore,
     onGameOver,
   });

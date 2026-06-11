@@ -22,6 +22,8 @@
 //     seeded from `state.score + state.foodEaten` so a given sequence
 //     of moves produces the same food layout — helpful for tests.
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useGameStore } from '../../store/gameStore';
+import type { GameId } from '../registry';
 import {
   DIRECTION_DELTAS,
   FOOD_PER_SPEEDUP,
@@ -37,6 +39,9 @@ import {
 import type { Cell, Direction, SnakeState } from './types';
 
 export type UseSnakeArgs = {
+  /** Game id (e.g. `'snake'`). Used to mark the game as played
+   *  for the `park-explorer` achievement (AC-11). */
+  gameId?: GameId;
   onScore: (score: number) => void;
   onGameOver: (finalScore: number) => void;
 };
@@ -90,6 +95,7 @@ function pickFoodFor(snake: readonly Cell[], seed: number): Cell {
 }
 
 export function useSnake({
+  gameId,
   onScore,
   onGameOver,
 }: UseSnakeArgs): UseSnakeResult {
@@ -190,13 +196,17 @@ export function useSnake({
     if (state.status === 'gameover' && !lastReportedGameOverRef.current) {
       lastReportedGameOverRef.current = true;
       onGameOverRef.current(state.score);
+      // AC-11: mark this game as played for the `park-explorer`
+      // achievement. The store call is idempotent so a duplicate
+      // (e.g. StrictMode double-invoke) is harmless.
+      if (gameId) useGameStore.getState().markGamePlayed(gameId);
     }
     if (state.status === 'running' && lastReportedGameOverRef.current) {
       // Re-mount / restart — reset the latch.
       lastReportedGameOverRef.current = false;
       lastReportedScoreRef.current = 0;
     }
-  }, [state.status, state.score]);
+  }, [state.status, state.score, gameId]);
 
   // Tick interval shrinks every FOOD_PER_SPEEDUP food. Floors at
   // MIN_TICK_MS so the snake never moves faster than the canvas can
