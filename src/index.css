@@ -44,3 +44,131 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* AC-4 ambient keyframes. Kept in CSS so the compositor can run
+   them off the main thread; the JS components only decide which
+   decorations to show and where to position them. */
+
+@keyframes cloud-drift {
+  0% {
+    transform: translateX(-30vw);
+  }
+  100% {
+    transform: translateX(130vw);
+  }
+}
+
+@keyframes balloon-float {
+  0% {
+    transform: translateY(110vh) translateX(0) rotate(-2deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-20vh) translateX(20px) rotate(3deg);
+    opacity: 0;
+  }
+}
+
+@keyframes mascot-wave {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-12deg);
+  }
+  40% {
+    transform: rotate(10deg);
+  }
+  60% {
+    transform: rotate(-8deg);
+  }
+  80% {
+    transform: rotate(6deg);
+  }
+}
+
+.mascot-wave {
+  animation: mascot-wave 3.2s ease-in-out infinite;
+  display: inline-block;
+}
+
+.ambient-clouds {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.cloud {
+  position: absolute;
+  width: 200px;
+  height: 60px;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0));
+  filter: blur(2px);
+  border-radius: 9999px;
+  animation: cloud-drift 60s linear infinite;
+}
+.cloud-1 {
+  top: 10%;
+  animation-delay: 0s;
+}
+.cloud-2 {
+  top: 28%;
+  width: 260px;
+  animation-delay: -20s;
+  animation-duration: 80s;
+}
+.cloud-3 {
+  top: 48%;
+  width: 160px;
+  animation-delay: -40s;
+  animation-duration: 50s;
+}
+
+.ambient-balloons {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.balloon {
+  position: absolute;
+  font-size: 2rem;
+  animation: balloon-float 24s linear infinite;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+.balloon-1 {
+  left: 12%;
+  animation-delay: 0s;
+}
+.balloon-2 {
+  left: 50%;
+  animation-delay: -8s;
+}
+.balloon-3 {
+  left: 78%;
+  animation-delay: -16s;
+}
+
+.ambient-fireflies,
+.ambient-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* AC-14 / accessibility: disable all decorative animations for
+   users who request reduced motion. Hover-scale and camera-zoom are
+   gated in JS (Framer Motion's useReducedMotion), but the CSS-only
+   loops still need this short-circuit. */
+@media (prefers-reduced-motion: reduce) {
+  .cloud,
+  .balloon,
+  .mascot-wave {
+    animation: none !important;
+  }
+}
