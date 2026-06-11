@@ -14,6 +14,7 @@ import type { ComponentType } from 'react';
 import PlaceholderGame from './placeholder';
 import { SnakeGame } from './snake';
 import { BrickBreakerGame } from './brick-breaker';
+import { TetrisGame } from './tetris';
 
 export type GameId =
   | 'snake'
@@ -86,7 +87,7 @@ export const GAME_REGISTRY: Record<GameId, GameRegistryEntry> = {
     attractionLabel: 'Puzzle Tower',
     description: 'Stack shimmering tetrominoes higher than the clouds.',
     emoji: '🧩',
-    component: PlaceholderGame as unknown as GameRegistryEntry['component'],
+    component: TetrisGame as unknown as GameRegistryEntry['component'],
   },
   'crystal-2048': {
     id: 'crystal-2048',
