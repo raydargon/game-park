@@ -13,6 +13,7 @@
 import type { ComponentType } from 'react';
 import PlaceholderGame from './placeholder';
 import { SnakeGame } from './snake';
+import { BrickBreakerGame } from './brick-breaker';
 
 export type GameId =
   | 'snake'
@@ -77,7 +78,7 @@ export const GAME_REGISTRY: Record<GameId, GameRegistryEntry> = {
     attractionLabel: 'Brick Break Castle',
     description: 'Bounce a glowing orb to shatter the fortress walls.',
     emoji: '🧱',
-    component: PlaceholderGame as unknown as GameRegistryEntry['component'],
+    component: BrickBreakerGame as unknown as GameRegistryEntry['component'],
   },
   tetris: {
     id: 'tetris',
