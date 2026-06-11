@@ -124,11 +124,14 @@ export default function ParkMap() {
             gridTemplateAreas: `"${GAME_IDS[0]}"`,
           }}
         >
-          {/* Desktop / tablet: the planned 3-column, 2-row grid. */}
+          {/* Desktop / tablet: 4-column, 2-row grid (AC-4). Fits
+              all 8 attractions on a 1024-wide viewport once
+              tank-war and shooting-plane land in their `*-2`
+              slots. */}
           <div
             className="hidden gap-4 sm:gap-5 md:grid"
             style={{
-              gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+              gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
               gridTemplateAreas: PARK_GRID_AREAS,
             }}
           >

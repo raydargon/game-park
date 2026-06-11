@@ -1,15 +1,24 @@
-// Layout metadata for the 5 Phase 1 attractions. Kept separate from
+// Layout metadata for the park attractions. Kept separate from
 // `src/games/registry.ts` because these props are presentation-only
 // (where the card sits in the park grid, which palette shade to glow
 // with) and should not be required by the generic registry type that
 // `GamePage` also consumes.
+//
+// AC-4 added `flappy-bird` (and the four-area extension below) to
+// support a 4-column × 2-row desktop grid that can hold all 8
+// attractions without overflow on a 1024-wide viewport. The two
+// new `*-2` slots are reserved for the future tank-war and
+// shooting-plane cards (AC-8 / AC-11).
 import type { GameId } from '../../games/registry';
 
 export type GridArea =
   | 'top-left'
+  | 'top-left-2'
   | 'top-center'
   | 'top-right'
   | 'bottom-left'
+  | 'bottom-left-2'
+  | 'bottom-center'
   | 'bottom-right';
 
 export type AttractionLayout = {
@@ -59,9 +68,21 @@ export const ATTRACTION_LAYOUT: Record<GameId, AttractionLayout> = {
     bodyGradient:
       'bg-gradient-to-br from-fantasy-blue/40 via-night-dusk/60 to-night-deep',
   },
+  'flappy-bird': {
+    // New 4-column area: second slot on the top row, between
+    // snake (top-left) and tetris (top-center).
+    area: 'top-left-2',
+    glowRing: 'ring-sky-morning',
+    titleColor: 'text-sky-morning',
+    bodyGradient:
+      'bg-gradient-to-br from-sky-morning/40 via-night-dusk/60 to-night-deep',
+  },
 };
 
-/** CSS `grid-template-areas` value for the park map. */
+/** CSS `grid-template-areas` value for the park map. 4 columns ×
+ *  2 rows. The two `-2` slots are still empty at AC-4; tank-war
+ *  and shooting-plane will fill them in AC-8 / AC-11, completing
+ *  the 8-card grid that AC-14 verifies. */
 export const PARK_GRID_AREAS =
-  '"top-left top-center top-right" ' +
-  '"bottom-left bottom-right bottom-right"';
+  '"top-left top-left-2 top-center top-right" ' +
+  '"bottom-left bottom-left-2 bottom-center bottom-right"';

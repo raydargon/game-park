@@ -16,13 +16,15 @@ import { BrickBreakerGame } from './brick-breaker';
 import { TetrisGame } from './tetris';
 import { Crystal2048Game } from './crystal-2048';
 import { MemoryGame } from './memory';
+import { FlappyGame } from './flappy-bird';
 
 export type GameId =
   | 'snake'
   | 'brick-breaker'
   | 'tetris'
   | 'crystal-2048'
-  | 'memory';
+  | 'memory'
+  | 'flappy-bird';
 
 export type GameComponentProps = {
   gameId: GameId;
@@ -69,6 +71,7 @@ export const GAME_IDS: readonly GameId[] = [
   'tetris',
   'crystal-2048',
   'memory',
+  'flappy-bird',
 ] as const;
 
 export const GAME_REGISTRY: Record<GameId, GameRegistryEntry> = {
@@ -112,6 +115,14 @@ export const GAME_REGISTRY: Record<GameId, GameRegistryEntry> = {
     emoji: '🌸',
     lowerIsBetter: true,
     component: MemoryGame as unknown as GameRegistryEntry['component'],
+  },
+  'flappy-bird': {
+    id: 'flappy-bird',
+    title: 'Flappy Wings',
+    attractionLabel: 'Flappy Wings',
+    description: 'Pilot a tiny bird through a gauntlet of enchanted pipes.',
+    emoji: '🐦',
+    component: FlappyGame as unknown as GameRegistryEntry['component'],
   },
 };
 
