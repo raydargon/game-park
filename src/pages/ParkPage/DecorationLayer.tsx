@@ -39,7 +39,6 @@ export default function DecorationLayer() {
   return (
     <div
       data-testid="decoration-layer"
-      aria-hidden={false}
       className="pointer-events-none absolute inset-0 z-0"
     >
       <AnimatePresence>
@@ -91,10 +90,6 @@ function Decoration({ spec, reduceMotion }: DecorationProps) {
         width: spec.size.width,
         height: spec.size.height,
         transformOrigin: spec.transformOrigin ?? 'center',
-        // Offset the position to anchor from the bottom-left
-        // when only top + width are given, etc. The CSS
-        // `translate(-50%, -50%)` here is opt-in per id (we use
-        // `transformOrigin: 'center'` to make it intuitive).
       }}
     >
       <div

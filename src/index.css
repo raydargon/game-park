@@ -262,15 +262,3 @@ body {
   transform-origin: top center;
   transform: scale(clamp(0.5, calc(100vw / 360px), 1));
 }
-
-/* AC-14: small utility for buttons that need the standard
-   focus-visible ring without writing the full class list each
-   time. The fantasy-cream accent is the same one used elsewhere
-   in the app. */
-.focus-ring {
-  outline: none;
-}
-.focus-ring:focus-visible {
-  outline: 2px solid #fff4b8; /* fantasy-cream */
-  outline-offset: 2px;
-}

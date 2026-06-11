@@ -41,14 +41,6 @@ import {
 /** Per-game high scores. Missing entries mean "never played". */
 export type HighScores = Partial<Record<GameId, number>>;
 
-/** Snapshot of the achievement-relevant slice. The watcher builds
- *  this on every store change and hands it to the pure
- *  `evaluateAchievements` helper. */
-export type AchievementSlice = Pick<
-  GameStore,
-  'highscores' | 'playedGames' | 'totalBricksCleared' | 'crystalBestTile'
->;
-
 export type GameStore = {
   // -- existing --
   highscores: HighScores;
