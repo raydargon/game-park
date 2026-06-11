@@ -65,7 +65,7 @@ export default function ParkMap() {
   return (
     <div
       data-testid="park-map"
-      className="relative isolate min-h-screen w-full overflow-hidden text-slate-50"
+      className="park-map-content relative isolate min-h-screen w-full overflow-hidden text-slate-50"
     >
       <DayNightSky
         auto={auto}

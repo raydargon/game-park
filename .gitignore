@@ -24,3 +24,4 @@ venv/
 .cursor/
 .turbo/
 .next/
+.vercel
