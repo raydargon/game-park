@@ -1,4 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
+import AchievementPopup from './components/AchievementPopup';
 import { useAchievementWatcher } from './hooks/useAchievementWatcher';
 import GamePage from './pages/GamePage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -17,10 +18,15 @@ export default function App() {
   useAchievementWatcher();
 
   return (
-    <Routes>
-      <Route path="/" element={<ParkPage />} />
-      <Route path="/play/:gameId" element={<GamePage />} />
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/" element={<ParkPage />} />
+        <Route path="/play/:gameId" element={<GamePage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+      {/* AC-12: achievement popup is mounted at the root so it
+          sits above every route's UI and survives navigation. */}
+      <AchievementPopup />
+    </>
   );
 }
