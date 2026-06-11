@@ -2,8 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
-/* AC-1 keeps the global stylesheet minimal. Reduced-motion and CSS variables
-   for the PRD palette land with AC-2 / AC-14. */
+/*
+ * DreamPlay Park — PRD §11 color palettes are mirrored as CSS custom
+ * properties so non-Tailwind contexts (inline SVG fills, canvas reads
+ * via getComputedStyle, day/night gradient interpolations in AC-4) can
+ * reference the same source of truth.
+ */
+:root {
+  --color-sky-morning: #aee2ff;
+  --color-sky-midday: #c7f9ff;
+  --color-sky-sunset: #fff5e4;
+
+  --color-fantasy-pink: #ffd6ec;
+  --color-fantasy-blue: #b8e8fc;
+  --color-fantasy-green: #d7ffd9;
+  --color-fantasy-cream: #fff4b8;
+
+  --color-night-deep: #2b2d42;
+  --color-night-dusk: #3a506b;
+  --color-night-glow: #5bc0be;
+}
 
 html,
 body,
