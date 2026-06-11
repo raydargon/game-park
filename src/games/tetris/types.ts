@@ -30,7 +30,7 @@ export type Tetromino = {
 /** A 20×10 grid of cell occupants. `null` = empty. */
 export type Board = (TetrominoId | null)[][];
 
-export type TetrisStatus = 'ready' | 'running' | 'gameover';
+export type TetrisStatus = 'running' | 'gameover';
 
 export type TetrisState = {
   board: Board;

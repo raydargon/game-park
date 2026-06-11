@@ -1,9 +1,9 @@
 // useTetris — pure logic hook for Tetris.
 //
-// State machine: `'ready' | 'running' | 'gameover'`. The hook
-// starts in `'ready'`; the first call to `step()` (which the game
-// loop dispatches on every gravity tick) flips the active piece
-// into place and moves to `'running'`. From there:
+// State machine: `'running' | 'gameover'`. The hook starts in
+// `'running'`; the first call to `step()` (which the game loop
+// dispatches on every gravity tick) moves the active piece one
+// row down. From there:
 //
 //   * `step()` advances gravity by one row. If the active piece
 //     can't move down, the piece is locked, lines are cleared, and
@@ -111,7 +111,7 @@ function createInitialState(initialSeed: number): TetrisState {
     score: 0,
     lines: 0,
     level: 1,
-    status: 'ready',
+    status: 'running',
   };
 }
 
@@ -343,10 +343,6 @@ export function useTetris({
       onGameOverRef.current(state.score);
       // AC-11: mark this game as played for `park-explorer`.
       if (gameId) useGameStore.getState().markGamePlayed(gameId);
-    }
-    if (state.status === 'ready' && lastReportedGameOverRef.current) {
-      lastReportedGameOverRef.current = false;
-      lastReportedScoreRef.current = state.score;
     }
   }, [state.status, state.score, gameId]);
 
