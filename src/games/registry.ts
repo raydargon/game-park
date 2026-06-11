@@ -5,12 +5,14 @@
 // renders it. `GamePage` validates the param against this registry;
 // unknown ids are redirected to `/`.
 //
-// The component contract expanded in AC-5: the shell passes
-// `isPaused`, `restartKey`, `onScore`, and `onGameOver` to every
-// game, so the registry type guarantees a consistent interface
-// across all five Phase 1 attractions.
+// The component contract grew in AC-5 (the shell passes `isPaused`,
+// `restartKey`, `onScore`, `onGameOver`) and again in AC-6 (the shell
+// also passes an optional `onRestart` for in-game "Play Again"
+// buttons on the game-over overlay). Each Phase 1 game progressively
+// replaces the `PlaceholderGame` with its real component.
 import type { ComponentType } from 'react';
 import PlaceholderGame from './placeholder';
+import { SnakeGame } from './snake';
 
 export type GameId =
   | 'snake'
@@ -32,6 +34,10 @@ export type GameComponentProps = {
   /** Tell the shell the run is over; the shell compares the final
    *  score against the persisted best and writes it through. */
   onGameOver: (finalScore: number) => void;
+  /** Ask the shell to restart the run (e.g. from an in-game "Play
+   *  Again" button on the game-over overlay). Optional so the
+   *  PlaceholderGame and any game that doesn't need it can omit it. */
+  onRestart?: () => void;
 };
 
 export type GameRegistryEntry = {
@@ -56,59 +62,47 @@ export const GAME_IDS: readonly GameId[] = [
   'memory',
 ] as const;
 
-const makeEntry = (
-  id: GameId,
-  title: string,
-  attractionLabel: string,
-  description: string,
-  emoji: string,
-): GameRegistryEntry => ({
-  id,
-  title,
-  attractionLabel,
-  description,
-  emoji,
-  // The placeholder accepts the full `GameComponentProps` shape; the
-  // registry type guarantees a complete prop bag at every call site.
-  component: PlaceholderGame as unknown as GameRegistryEntry['component'],
-});
-
 export const GAME_REGISTRY: Record<GameId, GameRegistryEntry> = {
-  snake: makeEntry(
-    'snake',
-    'Snake Kingdom',
-    'Snake Castle',
-    'Slither through the moonlit castle and gobble up starlight fruit.',
-    '🐍',
-  ),
-  'brick-breaker': makeEntry(
-    'brick-breaker',
-    'Brick Break Castle',
-    'Brick Break Castle',
-    'Bounce a glowing orb to shatter the fortress walls.',
-    '🧱',
-  ),
-  tetris: makeEntry(
-    'tetris',
-    'Puzzle Tower',
-    'Puzzle Tower',
-    'Stack shimmering tetrominoes higher than the clouds.',
-    '🧩',
-  ),
-  'crystal-2048': makeEntry(
-    'crystal-2048',
-    'Crystal Mine',
-    'Crystal Mine',
-    'Merge crystal tiles until you uncover the legendary 2048 gem.',
-    '💎',
-  ),
-  memory: makeEntry(
-    'memory',
-    'Magic Garden',
-    'Memory Garden',
-    'Find every pair of enchanted flowers before the petals fall.',
-    '🌸',
-  ),
+  snake: {
+    id: 'snake',
+    title: 'Snake Kingdom',
+    attractionLabel: 'Snake Castle',
+    description: 'Slither through the moonlit castle and gobble up starlight fruit.',
+    emoji: '🐍',
+    component: SnakeGame as unknown as GameRegistryEntry['component'],
+  },
+  'brick-breaker': {
+    id: 'brick-breaker',
+    title: 'Brick Break Castle',
+    attractionLabel: 'Brick Break Castle',
+    description: 'Bounce a glowing orb to shatter the fortress walls.',
+    emoji: '🧱',
+    component: PlaceholderGame as unknown as GameRegistryEntry['component'],
+  },
+  tetris: {
+    id: 'tetris',
+    title: 'Puzzle Tower',
+    attractionLabel: 'Puzzle Tower',
+    description: 'Stack shimmering tetrominoes higher than the clouds.',
+    emoji: '🧩',
+    component: PlaceholderGame as unknown as GameRegistryEntry['component'],
+  },
+  'crystal-2048': {
+    id: 'crystal-2048',
+    title: 'Crystal Mine',
+    attractionLabel: 'Crystal Mine',
+    description: 'Merge crystal tiles until you uncover the legendary 2048 gem.',
+    emoji: '💎',
+    component: PlaceholderGame as unknown as GameRegistryEntry['component'],
+  },
+  memory: {
+    id: 'memory',
+    title: 'Magic Garden',
+    attractionLabel: 'Memory Garden',
+    description: 'Find every pair of enchanted flowers before the petals fall.',
+    emoji: '🌸',
+    component: PlaceholderGame as unknown as GameRegistryEntry['component'],
+  },
 };
 
 /** Returns the entry for a gameId, or `undefined` if it is unknown. */

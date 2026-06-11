@@ -13,6 +13,10 @@
 //   * "End game" calls `onGameOver` with the current score; the
 //     shell persists the result and the Best field updates.
 //
+// AC-6 also adds an optional `onRestart` so in-game "Play Again"
+// buttons can request a shell-driven re-mount; the placeholder
+// doesn't need it but accepts it for type uniformity.
+//
 // The wrapper exposes `data-game-id` so e2e tests and the
 // AchievementPopup (AC-12) can target individual games without
 // coupling to the eventual game-specific component name.
@@ -27,7 +31,12 @@ export default function PlaceholderGame({
   restartKey,
   onScore,
   onGameOver,
+  onRestart,
 }: PlaceholderGameProps) {
+  // `onRestart` is part of GameComponentProps in AC-6; the placeholder
+  // doesn't need it (no game-over overlay) but we accept the prop so
+  // the shell can pass it uniformly.
+  void onRestart;
   // Local score so the buttons can do something useful (the shell
   // also receives a copy via `onScore` and renders it in the HUD).
   const [localScore, setLocalScore] = useState(0);

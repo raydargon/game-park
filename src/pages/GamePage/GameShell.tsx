@@ -151,6 +151,7 @@ export default function GameShell({ gameId, entry }: GameShellProps) {
           restartKey={restartKey}
           onScore={handleScore}
           onGameOver={handleGameOver}
+          onRestart={handleRestart}
         />
 
         <AnimatePresence>
