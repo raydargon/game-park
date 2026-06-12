@@ -6,9 +6,9 @@
 //
 // AC-4 added `flappy-bird` (and the four-area extension below) to
 // support a 4-column × 2-row desktop grid that can hold all 8
-// attractions without overflow on a 1024-wide viewport. The two
-// new `*-2` slots are reserved for the future tank-war and
-// shooting-plane cards (AC-8 / AC-11).
+// attractions without overflow on a 1024-wide viewport. AC-8 added
+// `tank-war` in the `bottom-left-2` slot; `bottom-center` is
+// still reserved for the future `shooting-plane` card (AC-11).
 import type { GameId } from '../../games/registry';
 
 export type GridArea =
@@ -77,12 +77,25 @@ export const ATTRACTION_LAYOUT: Record<GameId, AttractionLayout> = {
     bodyGradient:
       'bg-gradient-to-br from-sky-morning/40 via-night-dusk/60 to-night-deep',
   },
+  'tank-war': {
+    // New 4-column area: second slot on the bottom row, between
+    // crystal-2048 (bottom-left) and the (future) shooting-plane
+    // bottom-center card. AC-8 fills this slot; AC-11 will fill
+    // bottom-center.
+    area: 'bottom-left-2',
+    glowRing: 'ring-sky-sunset',
+    titleColor: 'text-sky-sunset',
+    bodyGradient:
+      'bg-gradient-to-br from-sky-sunset/40 via-night-dusk/60 to-night-deep',
+  },
 };
 
 /** CSS `grid-template-areas` value for the park map. 4 columns ×
- *  2 rows. The two `-2` slots are still empty at AC-4; tank-war
- *  and shooting-plane will fill them in AC-8 / AC-11, completing
- *  the 8-card grid that AC-14 verifies. */
+ *  2 rows. AC-4 filled the top row's second slot
+ *  (`top-left-2` -> flappy-bird); AC-8 filled the bottom row's
+ *  second slot (`bottom-left-2` -> tank-war); AC-11 will fill
+ *  `bottom-center` -> shooting-plane, completing the 8-card grid
+ *  that AC-14 verifies. */
 export const PARK_GRID_AREAS =
   '"top-left top-left-2 top-center top-right" ' +
   '"bottom-left bottom-left-2 bottom-center bottom-right"';

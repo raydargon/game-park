@@ -17,6 +17,7 @@ import { TetrisGame } from './tetris';
 import { Crystal2048Game } from './crystal-2048';
 import { MemoryGame } from './memory';
 import { FlappyGame } from './flappy-bird';
+import { TankGame } from './tank-war';
 
 export type GameId =
   | 'snake'
@@ -24,7 +25,8 @@ export type GameId =
   | 'tetris'
   | 'crystal-2048'
   | 'memory'
-  | 'flappy-bird';
+  | 'flappy-bird'
+  | 'tank-war';
 
 export type GameComponentProps = {
   gameId: GameId;
@@ -72,6 +74,7 @@ export const GAME_IDS: readonly GameId[] = [
   'crystal-2048',
   'memory',
   'flappy-bird',
+  'tank-war',
 ] as const;
 
 export const GAME_REGISTRY: Record<GameId, GameRegistryEntry> = {
@@ -123,6 +126,14 @@ export const GAME_REGISTRY: Record<GameId, GameRegistryEntry> = {
     description: 'Pilot a tiny bird through a gauntlet of enchanted pipes.',
     emoji: '🐦',
     component: FlappyGame as unknown as GameRegistryEntry['component'],
+  },
+  'tank-war': {
+    id: 'tank-war',
+    title: 'Tank Battlegrounds',
+    attractionLabel: 'Tank Battlegrounds',
+    description: 'Roll out and face a swarm of AI tanks in a top-down skirmish.',
+    emoji: '🪖',
+    component: TankGame as unknown as GameRegistryEntry['component'],
   },
 };
 
