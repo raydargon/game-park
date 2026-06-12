@@ -18,6 +18,7 @@ import { Crystal2048Game } from './crystal-2048';
 import { MemoryGame } from './memory';
 import { FlappyGame } from './flappy-bird';
 import { TankGame } from './tank-war';
+import { ShootingPlaneGame } from './shooting-plane';
 
 export type GameId =
   | 'snake'
@@ -26,7 +27,8 @@ export type GameId =
   | 'crystal-2048'
   | 'memory'
   | 'flappy-bird'
-  | 'tank-war';
+  | 'tank-war'
+  | 'shooting-plane';
 
 export type GameComponentProps = {
   gameId: GameId;
@@ -75,6 +77,7 @@ export const GAME_IDS: readonly GameId[] = [
   'memory',
   'flappy-bird',
   'tank-war',
+  'shooting-plane',
 ] as const;
 
 export const GAME_REGISTRY: Record<GameId, GameRegistryEntry> = {
@@ -134,6 +137,14 @@ export const GAME_REGISTRY: Record<GameId, GameRegistryEntry> = {
     description: 'Roll out and face a swarm of AI tanks in a top-down skirmish.',
     emoji: '🪖',
     component: TankGame as unknown as GameRegistryEntry['component'],
+  },
+  'shooting-plane': {
+    id: 'shooting-plane',
+    title: 'Sky Squadron',
+    attractionLabel: 'Sky Squadron',
+    description: 'Pilot a tiny plane through waves of descending enemy fighters.',
+    emoji: '✈️',
+    component: ShootingPlaneGame as unknown as GameRegistryEntry['component'],
   },
 };
 
