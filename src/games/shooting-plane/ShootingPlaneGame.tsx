@@ -25,7 +25,7 @@
 // The rAF loop runs step(deltaMs) every animation frame while
 // the game is alive; the loop pauses on isPaused or gameover.
 import { useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useGameLoop } from '../../hooks/useGameLoop';
 import { useKeyboard } from '../../hooks/useKeyboard';
 import type { GameComponentProps } from '../registry';
@@ -60,6 +60,12 @@ export default function ShootingPlaneGame({
   onRestart,
 }: GameComponentProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  // AC-20: respect the user's reduced-motion preference. The Game
+  // Over overlay's fade-in is reduced to a near-instant transition
+  // so the overlay still appears (score, button, copy) but no
+  // animated chrome is shown.
+  const reduce = useReducedMotion();
+  const overlayDuration = reduce ? 0.01 : 0.2;
 
   const { state, step, move, fire } = useShootingPlane({
     gameId,
@@ -129,7 +135,7 @@ export default function ShootingPlaneGame({
           data-testid="shooting-plane-gameover"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: overlayDuration }}
           className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 rounded-2xl bg-night-deep/85 px-6 text-center text-slate-50 backdrop-blur-sm"
         >
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-night-glow">

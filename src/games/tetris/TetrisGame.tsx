@@ -16,7 +16,7 @@
 // per-level gravity interval, then calls `step()` (capped at 4
 // catch-up steps so a tab-blur can't fast-forward forever).
 import { useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useGameLoop } from '../../hooks/useGameLoop';
 import { useKeyboard } from '../../hooks/useKeyboard';
 import type { GameComponentProps } from '../registry';
@@ -44,6 +44,12 @@ export default function TetrisGame({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const accumulatorRef = useRef(0);
   const softDropHeldRef = useRef(false);
+  // AC-20: respect the user's reduced-motion preference. The Game
+  // Over overlay's fade-in is reduced to a near-instant transition
+  // so the overlay still appears (the score, button, and copy are
+  // unchanged) but no animated chrome is shown.
+  const reduce = useReducedMotion();
+  const overlayDuration = reduce ? 0.01 : 0.2;
 
   const {
     state,
@@ -168,7 +174,7 @@ export default function TetrisGame({
           data-testid="tetris-gameover"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: overlayDuration }}
           className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-2xl bg-night-deep/85 px-6 text-center text-slate-50 backdrop-blur-sm"
         >
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-night-glow">

@@ -20,7 +20,7 @@
 //   * `score` mirrors the latest value the game reported via
 //     `onScore`. Restart zeros it. Game-over writes it to the
 //     persisted high score for the current `gameId`.
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getGameEntry, type GameId, type GameRegistryEntry } from '../../games/registry';
@@ -46,6 +46,12 @@ export default function GameShell({ gameId, entry }: GameShellProps) {
   const [score, setScore] = useState(0);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const { isFullscreen, toggle } = useFullscreen();
+  // AC-20: respect the user's reduced-motion preference. The pause
+  // overlay's fade is reduced to a near-instant transition so users
+  // who have asked the OS for less motion don't see any animated
+  // overlay chrome.
+  const reduce = useReducedMotion();
+  const overlayDuration = reduce ? 0.01 : 0.18;
 
   // Read the persisted best once on mount. The store is reactive
   // so a second tab updating the value will be picked up here too.
@@ -174,7 +180,7 @@ export default function GameShell({ gameId, entry }: GameShellProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.18 }}
+              transition={{ duration: overlayDuration }}
               className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-night-deep/70 text-slate-50 backdrop-blur-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-fantasy-cream"
             >
               <span aria-hidden className="text-6xl drop-shadow">
