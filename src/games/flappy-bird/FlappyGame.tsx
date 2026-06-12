@@ -1,16 +1,21 @@
 // FlappyGame — Canvas + keyboard + rAF loop wrapper for Flappy Wings.
 //
-// AC-4 ships the full wiring (Canvas, gravity, Space/ArrowUp flap,
-// floor/ceiling game over) but no pipes yet — pipe obstacles,
-// scoring, and onScore reporting land in AC-5. The shape mirrors
-// the existing games so AC-5 can drop in cleanly without
-// re-wiring the shell.
+// AC-4 shipped the basic shell (Canvas, gravity, Space/ArrowUp flap,
+// floor game over). AC-5 adds:
+//   * Scrolling pipe pairs with vertical gaps, spawned on a
+//     `PIPE_SPAWN_INTERVAL_MS` cadence.
+//   * Bird ↔ pipe (top + bottom rect) and bird ↔ ceiling collision.
+//   * A `state.score` field that increments by 1 every time a pipe
+//     pair passes the bird; the game-over overlay shows the real
+//     final score (replacing the AC-4 placeholder `{0}`).
+//   * Real `onScore` reporting (StrictMode-safe) via the hook's
+//     `useEffect` watcher.
 //
 // Controls:
 //   * Space / ArrowUp (or W) — flap (upward velocity impulse).
 //   * Click / tap on canvas — also flaps (for pointer input).
 //
-// The rAF loop runs `step()` every animation frame while the
+// The rAF loop runs `step(deltaMs)` every animation frame while the
 // game is alive; the loop pauses on `isPaused` or `gameover`.
 import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
@@ -27,6 +32,11 @@ import {
   CANVAS_W,
   FLOOR_COLOR,
   FLOOR_Y,
+  PIPE_CAP_H,
+  PIPE_COLOR,
+  PIPE_GAP,
+  PIPE_OUTLINE_COLOR,
+  PIPE_W,
   SKY_COLOR,
 } from './constants';
 import type { FlappyState } from './types';
@@ -49,11 +59,13 @@ export default function FlappyGame({
     Space: () => flap(),
   });
 
-  // rAF loop: step the simulation every frame while alive. The
-  // loop pauses on `isPaused` (shell pause) or `gameover` (so the
-  // canvas freezes on the final frame).
-  useGameLoop(() => {
-    step();
+  // rAF loop: step the simulation every frame while alive. We pass
+  // `deltaMs` to `step` so the hook can drive time-based pipe
+  // spawning (a fixed-frame spawn would be framerate-dependent).
+  // The loop pauses on `isPaused` (shell pause) or `gameover` (so
+  // the canvas freezes on the final frame).
+  useGameLoop((deltaMs) => {
+    step(deltaMs);
   }, isPaused || state.status === 'gameover');
 
   // Redraw on every state change.
@@ -107,7 +119,7 @@ export default function FlappyGame({
               data-testid="flappy-final-score"
               className="font-bold text-fantasy-cream"
             >
-              {0}
+              {state.score}
             </span>
           </p>
           {onRestart && (
@@ -140,6 +152,12 @@ function drawScene(ctx: CanvasRenderingContext2D, state: FlappyState): void {
   drawCloud(ctx, 40, 80, 1.2);
   drawCloud(ctx, 220, 140, 0.9);
   drawCloud(ctx, 120, 200, 1.0);
+
+  // Pipes (drawn before the floor so the floor covers the bottom
+  // edges cleanly).
+  for (const pipe of state.pipes) {
+    drawPipe(ctx, pipe.x, pipe.gapY);
+  }
 
   // Floor strip.
   ctx.fillStyle = FLOOR_COLOR;
@@ -206,6 +224,37 @@ function drawScene(ctx: CanvasRenderingContext2D, state: FlappyState): void {
   ctx.ellipse(-3, 2, 7, 4 + Math.sin(performance.now() / 120) * 1.5, 0, 0, Math.PI * 2);
   ctx.stroke();
   ctx.restore();
+}
+
+function drawPipe(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  gapY: number,
+): void {
+  const topBottom = gapY - PIPE_GAP / 2;
+  const bottomTop = gapY + PIPE_GAP / 2;
+
+  // Top pipe: spans from y=0 to topBottom.
+  ctx.fillStyle = PIPE_COLOR;
+  ctx.fillRect(x, 0, PIPE_W, topBottom);
+  ctx.strokeStyle = PIPE_OUTLINE_COLOR;
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x + 0.5, 0.5, PIPE_W - 1, topBottom - 1);
+  // Top pipe cap (a slightly wider lip at the bottom of the top pipe).
+  ctx.fillStyle = PIPE_COLOR;
+  ctx.fillRect(x - 3, topBottom - PIPE_CAP_H, PIPE_W + 6, PIPE_CAP_H);
+  ctx.strokeRect(x - 2.5, topBottom - PIPE_CAP_H, PIPE_W + 5, PIPE_CAP_H - 0.5);
+
+  // Bottom pipe: spans from bottomTop to FLOOR_Y.
+  ctx.fillStyle = PIPE_COLOR;
+  ctx.fillRect(x, bottomTop, PIPE_W, FLOOR_Y - bottomTop);
+  ctx.strokeStyle = PIPE_OUTLINE_COLOR;
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x + 0.5, bottomTop, PIPE_W - 1, FLOOR_Y - bottomTop - 1);
+  // Bottom pipe cap.
+  ctx.fillStyle = PIPE_COLOR;
+  ctx.fillRect(x - 3, bottomTop, PIPE_W + 6, PIPE_CAP_H);
+  ctx.strokeRect(x - 2.5, bottomTop, PIPE_W + 5, PIPE_CAP_H - 0.5);
 }
 
 function drawCloud(ctx: CanvasRenderingContext2D, x: number, y: number, scale: number): void {

@@ -32,6 +32,38 @@ export const FLAP_VY = -8;
  *  through the floor in one frame). */
 export const MAX_VY = 12;
 
+// ----- Pipes (AC-5) -----
+
+/** Width of a single pipe (top or bottom segment of a pair). */
+export const PIPE_W = 58;
+
+/** Vertical size of the open gap between the top and bottom pipe
+ *  of a pair. The bird's center must traverse this gap. */
+export const PIPE_GAP = 150;
+
+/** Horizontal scroll speed of the pipe field (px/frame). Tuned so
+ *  a 60 fps canvas feels close to classic Flappy Bird pacing. */
+export const PIPE_SPEED = 2.4;
+
+/** Time (in ms) between new pipe-pair spawns. Together with
+ *  PIPE_SPEED this controls the spacing between successive pipes. */
+export const PIPE_SPAWN_INTERVAL_MS = 1600;
+
+/** Range of the *vertical center* of the gap (in canvas y). The
+ *  playfield is `0..FLOOR_Y`, so the gap stays clear of the floor
+ *  strip with at least `PIPE_GAP / 2` of breathing room. */
+export const PIPE_MIN_GAP_Y = 180;
+export const PIPE_MAX_GAP_Y = FLOOR_Y - 180;
+
+/** Cap (px/frame) on how many pipes we'll move in a single step.
+ *  Guards against a multi-second tab-blur teleport that would let
+ *  the bird clip through a pipe. */
+export const MAX_PIPE_STEP_PX = 24;
+
+/** A small visual cap on the top of the pipe so the renderer can
+ *  show a darker rim. */
+export const PIPE_CAP_H = 14;
+
 // ----- Colors (pulled from the Tailwind palette, see
 // `src/pages/GamePage/...` and `tailwind.config.ts`) -----
 
@@ -46,3 +78,9 @@ export const BIRD_OUTLINE = '#2B2D42'; // night-deep
 
 /** Floor strip color. */
 export const FLOOR_COLOR = '#3A506B'; // night-dusk
+
+/** Pipe fill color (a soft forest green that contrasts with the sky). */
+export const PIPE_COLOR = '#5BAE6A'; // close to emerald-500
+
+/** Pipe outline + cap highlight (a darker green). */
+export const PIPE_OUTLINE_COLOR = '#2E5D3A';
